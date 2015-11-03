@@ -46,6 +46,12 @@
   (puppet-run-check-command (concat "puppet-lint --fix " (buffer-file-name)) "*puppet-lint*"))
 
 
+;; Ansible
+(prelude-require-package 'company-ansible)
+(prelude-require-package 'ansible)
+(prelude-require-package 'ansible-doc)
+
+
 ;; Auto-complete
 (prelude-require-package 'auto-complete)
 (prelude-require-package 'ac-etags)
