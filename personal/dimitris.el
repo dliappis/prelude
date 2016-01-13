@@ -73,6 +73,10 @@
 (add-hook 'python-mode-hook 'set-python-mode-defaults)
 (setq flycheck-flake8-maximum-line-length 120)
 
+;; org-mode
+;; Install package to allow markdown export from org-mode
+(require 'ox-gfm)
+
 
 (provide 'dimitris)
 ;;; dimitris.el ends here
