@@ -75,7 +75,7 @@
 
 ;; org-mode
 ;; Install package to allow markdown export from org-mode
-(require 'ox-gfm)
+(prelude-require-package 'ox-gfm)
 
 
 (provide 'dimitris)
