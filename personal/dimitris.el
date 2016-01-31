@@ -13,11 +13,12 @@
 
 (set-face-attribute 'cursor () :background "#0f0")
 (add-hook 'minibuffer-setup-hook (lambda ()
-                                   (setq-local face-remapping-alist '((default :height 100)))))
+                                   (setq-local face-remapping-alist '((default :height 80)))))
 (with-current-buffer (get-buffer " *Echo Area 0*")
-  (setq-local face-remapping-alist '((default :height 100))))
+  (setq-local face-remapping-alist '((default :height 80))))
 (with-current-buffer (get-buffer " *Echo Area 1*")
-  (setq-local face-remapping-alist '((default :height 100))))
+  (setq-local face-remapping-alist '((default :height 80))))
+(set-face-attribute 'default nil :height 90)
 
 
 ;; Look and Feel
@@ -77,6 +78,26 @@
 ;; Install package to allow markdown export from org-mode
 (prelude-require-package 'ox-gfm)
 
+;; use grip for markdown preview
+(defvar Y/markdown-process nil)
+(defun Y/markdown-preview (&rest _)
+  "Preview markdown file by using grip."
+  (let ((gfm (if (eq major-mode 'gfm-mode) "--gfm" "")))
+    (when (process-live-p Y/markdown-process)
+      (kill-process Y/markdown-process))
+    (setq Y/markdown-process
+          (start-process-shell-command "emacs-markdown-preview"
+                                       markdown-output-buffer-name
+                                       (format "~/bin/viewmarkdown --browser %s" buffer-file-name)))
+    (run-with-timer 10 ; sec
+                    nil (lambda ()
+                          (when (process-live-p Y/markdown-process)
+                            (kill-process Y/markdown-process))))))
+
+;; Use advice to use preview at both markdown-mode and gfm-mode.
+(advice-add 'markdown-preview :override 'Y/markdown-preview)
+
+;;(setq markdown-open-command "viewmarkdown --browser")
 
 (provide 'dimitris)
 ;;; dimitris.el ends here
