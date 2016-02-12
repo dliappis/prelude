@@ -1,3 +1,30 @@
+;; Define packages instead of modifying prelude-modules.el
+(require 'prelude-erc)
+(require 'prelude-ido) ;; Super charges Emacs completion for C-x C-f and more
+(require 'prelude-helm) ;; Interface for narrowing and search
+(require 'prelude-helm-everywhere) ;; Enable Helm everywhere
+(require 'prelude-company)
+;;; Programming languages support
+(require 'prelude-c)
+(require 'prelude-clojure)
+(require 'prelude-css)
+(require 'prelude-emacs-lisp)
+(require 'prelude-go)
+(require 'prelude-haskell)
+(require 'prelude-js)
+(require 'prelude-lisp)
+(require 'prelude-org) ;; Org-mode helps you keep TODO lists, notes and more
+(require 'prelude-perl)
+(require 'prelude-python)
+(require 'prelude-ruby)
+(require 'prelude-scheme)
+(require 'prelude-shell)
+(require 'prelude-web) ;; Emacs mode for web templates
+(require 'prelude-xml)
+(require 'prelude-yaml)
+
+(prelude-require-packages '(smart-shift jinja2-mode))
+
 ; Disable warning about use of cursor keys for navigation
 (setq prelude-guru nil)
 
