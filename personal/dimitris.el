@@ -29,6 +29,11 @@
 (ido-mode 1)
 (ido-everywhere 1)
 (ido-vertical-mode 1)
+(add-hook
+ 'ido-setup-hook
+ (lambda ()
+   (define-key ido-completion-map (kbd "C-n") 'ido-next-match)
+   (define-key ido-completion-map (kbd "C-p") 'ido-prev-match)))
 
 (require 'ido-ubiquitous)
 (ido-ubiquitous-mode 1)
