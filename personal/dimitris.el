@@ -1,8 +1,8 @@
 ;; Define packages instead of modifying prelude-modules.el
 (require 'prelude-erc)
 (require 'prelude-ido) ;; Super charges Emacs completion for C-x C-f and more
-(require 'prelude-helm) ;; Interface for narrowing and search
-(require 'prelude-helm-everywhere) ;; Enable Helm everywhere
+;; (require 'prelude-helm) ;; Interface for narrowing and search
+;; (require 'prelude-helm-everywhere) ;; Enable Helm everywhere
 (require 'prelude-company)
 ;;; Programming languages support
 (require 'prelude-c)
@@ -23,7 +23,18 @@
 (require 'prelude-xml)
 (require 'prelude-yaml)
 
-(prelude-require-packages '(smart-shift jinja2-mode))
+(prelude-require-packages '(smart-shift jinja2-mode ido-ubiquitous ido-vertical-mode))
+
+(require 'ido-vertical-mode)
+(ido-mode 1)
+(ido-everywhere 1)
+(ido-vertical-mode 1)
+
+(require 'ido-ubiquitous)
+(ido-ubiquitous-mode 1)
+
+(require 'flx-ido)
+(flx-ido-mode 1)
 
 ; Disable warning about use of cursor keys for navigation
 (setq prelude-guru nil)
