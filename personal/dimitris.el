@@ -47,6 +47,7 @@
 ;; Theme
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
 (setq custom-theme-directory "~/.emacs.d/themes")
+(prelude-require-package 'color-theme-sanityinc-tomorrow)
 ;; (prelude-require-package 'solarized-theme)
 ;; (load-theme 'solarized-dark t)
 ;; (prelude-require-package 'xterm-color)
@@ -120,6 +121,9 @@
 ;; org-mode
 ;; Install package to allow markdown export from org-mode
 (prelude-require-package 'ox-gfm)
+(prelude-require-package 'org-present)
+(prelude-require-package 'epresent)
+(org-babel-do-load-languages 'org-babel-load-languages '((sh . t)))
 
 ;; use grip for markdown preview
 (defvar Y/markdown-process nil)
