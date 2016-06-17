@@ -116,7 +116,7 @@
   (setq jedi:complete-on-dot t))
   ;; (local-set-key (kbd "RET") 'newline-and-indent))
 (add-hook 'python-mode-hook 'set-python-mode-defaults)
-(setq flycheck-flake8-maximum-line-length 120)
+(setq flycheck-flake8-maximum-line-length 180)
 
 ;; org-mode
 ;; Install package to allow markdown export from org-mode
