@@ -106,6 +106,7 @@
 
 ;; Python
 (prelude-require-package 'jedi)
+(prelude-require-package 'company-jedi)
 (defun electric-indent-ignore-python (char)
   "Ignore electric indentation for python-mode."
   (if (equal major-mode 'python-mode) `no-indent' nil))
