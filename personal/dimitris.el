@@ -84,6 +84,10 @@
 (setq inhibit-startup-message t)
 
 
+;; AsciiDoc mode
+(prelude-require-package 'adoc-mode)
+
+
 ;; Puppet
 (defun puppet-lint-fix ()
   "Run the current buffer's file through 'puppet-lint --fix'."
