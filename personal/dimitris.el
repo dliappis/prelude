@@ -108,6 +108,9 @@
 (require 'auto-complete)
 (global-auto-complete-mode t)
 
+;; hcl-mode
+(prelude-require-packages '(hcl-mode))
+(require 'hcl-mode)
 
 ;; Python
 (prelude-require-package 'jedi)
