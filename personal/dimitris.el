@@ -41,6 +41,15 @@
 (require 'flx-ido)
 (flx-ido-mode 1)
 
+; Define ControlPath for tramp mode
+(setq tramp-ssh-controlmaster-options
+      (concat
+       "-o ControlPath=~/.ssh/emacs-ssh-%%h-%%p-%%r "
+       "-o Compression=yes "
+       "-o ControlMaster=auto "
+       "-o ControlPersist=yes "
+       "-o ServerAliveInterval=240"))
+
 ; Disable warning about use of cursor keys for navigation
 (setq prelude-guru nil)
 
@@ -67,7 +76,10 @@
 
 ;; Look and Feel
 ;(global-rainbow-delimiters-mode)
-(scroll-bar-mode -1)
+(if (display-graphic-p)
+    (progn
+      (tool-bar-mode -1)
+      (scroll-bar-mode -1)))
 (global-hl-line-mode -1)
 (electric-indent-mode -1)
 (global-prettify-symbols-mode)
