@@ -23,7 +23,7 @@
 (require 'prelude-xml)
 (require 'prelude-yaml)
 
-(prelude-require-packages '(smart-shift jinja2-mode ido-ubiquitous ido-vertical-mode))
+(prelude-require-packages '(smart-shift jinja2-mode ido-completing-read+ ido-vertical-mode))
 
 (require 'ido-vertical-mode)
 (ido-mode 1)
@@ -34,9 +34,6 @@
  (lambda ()
    (define-key ido-completion-map (kbd "C-n") 'ido-next-match)
    (define-key ido-completion-map (kbd "C-p") 'ido-prev-match)))
-
-(require 'ido-ubiquitous)
-(ido-ubiquitous-mode 1)
 
 (require 'flx-ido)
 (flx-ido-mode 1)
