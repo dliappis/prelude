@@ -1,6 +1,6 @@
 ;; Define packages instead of modifying prelude-modules.el
 (require 'prelude-erc)
-(require 'prelude-ido) ;; Super charges Emacs completion for C-x C-f and more
+;; (require 'prelude-ido) ;; Super charges Emacs completion for C-x C-f and more
 (require 'prelude-helm) ;; Interface for narrowing and search
 (require 'prelude-helm-everywhere) ;; Enable Helm everywhere
 (require 'prelude-company)
@@ -23,20 +23,21 @@
 (require 'prelude-xml)
 (require 'prelude-yaml)
 
-(prelude-require-packages '(smart-shift jinja2-mode ido-completing-read+ ido-vertical-mode))
+;; (prelude-require-packages '(smart-shift jinja2-mode ido-completing-read+ ido-vertical-mode))
+(prelude-require-packages '(smart-shift jinja2-mode))
 
-(require 'ido-vertical-mode)
-(ido-mode 1)
-(ido-everywhere 1)
-(ido-vertical-mode 1)
-(add-hook
- 'ido-setup-hook
- (lambda ()
-   (define-key ido-completion-map (kbd "C-n") 'ido-next-match)
-   (define-key ido-completion-map (kbd "C-p") 'ido-prev-match)))
+;; (require 'ido-vertical-mode)
+;; (ido-mode 1)
+;; (ido-everywhere 1)
+;; (ido-vertical-mode 1)
+;; (add-hook
+;;  'ido-setup-hook
+;;  (lambda ()
+;;    (define-key ido-completion-map (kbd "C-n") 'ido-next-match)
+;;    (define-key ido-completion-map (kbd "C-p") 'ido-prev-match)))
 
-(require 'flx-ido)
-(flx-ido-mode 1)
+;; (require 'flx-ido)
+;; (flx-ido-mode 1)
 
 ; Define ControlPath for tramp mode
 (setq tramp-ssh-controlmaster-options
