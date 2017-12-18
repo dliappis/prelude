@@ -23,6 +23,9 @@
 (require 'prelude-xml)
 (require 'prelude-yaml)
 
+;; Minor mode to help with Indent Guide marks
+(prelude-require-package 'indent-guide)
+
 ;; (prelude-require-packages '(smart-shift jinja2-mode ido-completing-read+ ido-vertical-mode))
 (prelude-require-packages '(smart-shift jinja2-mode))
 
@@ -111,7 +114,6 @@
 (prelude-require-package 'ansible)
 (prelude-require-package 'ansible-doc)
 
-
 ;; Auto-complete
 (prelude-require-package 'auto-complete)
 (prelude-require-package 'ac-etags)
@@ -130,13 +132,14 @@
   "Ignore electric indentation for python-mode."
   (if (equal major-mode 'python-mode) `no-indent' nil))
 (add-hook 'electric-indent-functions 'electric-indent-ignore-python)
-
 (defun set-python-mode-defaults ()
   (setq jedi:setup-keys t)
   (setq jedi:complete-on-dot t))
   ;; (local-set-key (kbd "RET") 'newline-and-indent))
 (add-hook 'python-mode-hook 'set-python-mode-defaults)
 (setq flycheck-flake8-maximum-line-length 180)
+;; Autostart indent-guide-mode in Python mode
+(add-hook 'python-mode-hook 'indent-guide-mode)
 
 ;; org-mode
 ;; Install package to allow markdown export from org-mode
@@ -165,6 +168,11 @@
 (advice-add 'markdown-preview :override 'Y/markdown-preview)
 
 ;;(setq markdown-open-command "viewmarkdown --browser")
+
+
+;; YAML
+;; Autostart indent-guide-mode in yaml mode
+(add-hook 'yaml-mode-hook 'indent-guide-mode)
 
 (provide 'dimitris)
 ;;; dimitris.el ends here
