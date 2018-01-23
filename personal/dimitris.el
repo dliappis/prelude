@@ -141,13 +141,6 @@
 ;; Autostart indent-guide-mode in Python mode
 (add-hook 'python-mode-hook 'indent-guide-mode)
 
-;; org-mode
-;; Install package to allow markdown export from org-mode
-(prelude-require-package 'ox-gfm)
-(prelude-require-package 'org-present)
-(prelude-require-package 'epresent)
-(org-babel-do-load-languages 'org-babel-load-languages '((sh . t)))
-
 ;; use grip for markdown preview
 (defvar Y/markdown-process nil)
 (defun Y/markdown-preview (&rest _)
