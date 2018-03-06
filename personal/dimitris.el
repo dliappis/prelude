@@ -58,8 +58,8 @@
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
 (setq custom-theme-directory "~/.emacs.d/themes")
 (prelude-require-package 'color-theme-sanityinc-tomorrow)
-;; (prelude-require-package 'solarized-theme)
-;; (load-theme 'solarized-dark t)
+(prelude-require-package 'solarized-theme)
+(load-theme 'solarized-dark t)
 ;; (prelude-require-package 'xterm-color)
 ;; (require 'xterm-color)
 ;; (set-face-attribute 'mode-line () :height 80 :background "#0C1F1F")
@@ -140,7 +140,8 @@
 (setq flycheck-flake8-maximum-line-length 180)
 ;; Autostart indent-guide-mode in Python mode
 (add-hook 'python-mode-hook 'indent-guide-mode)
-
+;; disable whitespace mode
+(add-hook 'python-mode-hook' 'whitespace-turn-off)
 ;; use grip for markdown preview
 (defvar Y/markdown-process nil)
 (defun Y/markdown-preview (&rest _)
@@ -162,10 +163,26 @@
 
 ;;(setq markdown-open-command "viewmarkdown --browser")
 
+;; whitespace mode
+(setq whitespace-line-column 140)
 
 ;; YAML
 ;; Autostart indent-guide-mode in yaml mode
 (add-hook 'yaml-mode-hook 'indent-guide-mode)
+
+;; org-capture for quick notes
+(setq org-notes-dir "/home/dl/Dropbox/Notes")
+(setq org-default-notes-file (concat org-notes-dir "/notes.org"))
+(setq org-capture-templates
+      '(("t" "Todo" entry (file+headline org-default-notes-file "Tasks")
+             "* TODO %?\n  %i\n  %a")
+        ("n" "Notes" entry (file+headline org-default-notes-file "Notes")
+             "* %?\n")
+        ("k" "Linux Kernel Notes" entry (file+olp org-default-notes-file "Notes" "Linux Kernel")
+             "* %?\n")
+        ("j" "Journal" entry (file+olp+datetree org-default-notes-file "Journal")
+             "* %?\nEntered on %U\n  %i\n  %a")))
+(define-key global-map "\C-cc" 'org-capture)
 
 (provide 'dimitris)
 ;;; dimitris.el ends here
