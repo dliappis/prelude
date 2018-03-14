@@ -58,8 +58,11 @@
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
 (setq custom-theme-directory "~/.emacs.d/themes")
 (prelude-require-package 'color-theme-sanityinc-tomorrow)
-(prelude-require-package 'solarized-theme)
-(load-theme 'solarized-dark t)
+;; Solarized (dark) is really nice, but it's colors don't work too well with magit
+;;(prelude-require-package 'solarized-theme)
+;;(load-theme 'solarized-dark t)
+(prelude-require-package 'zenburn-theme)
+(load-theme 'zenburn t)
 ;; (prelude-require-package 'xterm-color)
 ;; (require 'xterm-color)
 ;; (set-face-attribute 'mode-line () :height 80 :background "#0C1F1F")
