@@ -23,6 +23,11 @@
 (require 'prelude-xml)
 (require 'prelude-yaml)
 
+;; Packages required for silver search (ag) in projectile
+;; NOTE: You also need `the_silver_searcher' package on your OS: https://github.com/ggreer/the_silver_searcher
+(require 'ag) ;; https://github.com/Wilfred/ag.el
+(require 'emacs-helm-ag) ;; https://github.com/syohex/emacs-helm-ag
+
 ;; Minor mode to help with Indent Guide marks
 (prelude-require-package 'indent-guide)
 
