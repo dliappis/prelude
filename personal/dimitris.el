@@ -23,6 +23,11 @@
 (require 'prelude-xml)
 (require 'prelude-yaml)
 
+;; Use C-c p everywhere for projectile commands
+(require 'projectile)
+(define-key projectile-mode-map projectile-keymap-prefix nil)
+(define-key projectile-mode-map (kbd "C-c p") #'projectile-command-map)
+
 ;; Packages required for silver search (ag) in projectile
 ;; NOTE: You also need `the_silver_searcher' package on your OS: https://github.com/ggreer/the_silver_searcher
 (prelude-require-package 'ag) ;; https://github.com/Wilfred/ag.el
@@ -33,19 +38,6 @@
 
 ;; (prelude-require-packages '(smart-shift jinja2-mode ido-completing-read+ ido-vertical-mode))
 (prelude-require-packages '(smart-shift jinja2-mode))
-
-;; (require 'ido-vertical-mode)
-;; (ido-mode 1)
-;; (ido-everywhere 1)
-;; (ido-vertical-mode 1)
-;; (add-hook
-;;  'ido-setup-hook
-;;  (lambda ()
-;;    (define-key ido-completion-map (kbd "C-n") 'ido-next-match)
-;;    (define-key ido-completion-map (kbd "C-p") 'ido-prev-match)))
-
-;; (require 'flx-ido)
-;; (flx-ido-mode 1)
 
 ; Define ControlPath for tramp mode
 (setq tramp-ssh-controlmaster-options
