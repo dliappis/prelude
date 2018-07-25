@@ -149,7 +149,8 @@
 ;; Autostart indent-guide-mode in Python mode
 (add-hook 'python-mode-hook 'indent-guide-mode)
 ;; disable whitespace mode
-(add-hook 'python-mode-hook' 'whitespace-turn-off)
+;;(add-hook 'python-mode-hook' 'whitespace-turn-off)
+
 ;; use grip for markdown preview
 (defvar Y/markdown-process nil)
 (defun Y/markdown-preview (&rest _)
