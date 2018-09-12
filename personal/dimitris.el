@@ -25,8 +25,8 @@
 
 ;; Use C-c p everywhere for projectile commands
 (require 'projectile)
-(define-key projectile-mode-map projectile-keymap-prefix nil)
-(define-key projectile-mode-map (kbd "C-c p") #'projectile-command-map)
+;;(define-key projectile-mode-map projectile-keymap-prefix nil)
+(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 
 ;; Packages required for silver search (ag) in projectile
 ;; NOTE: You also need `the_silver_searcher' package on your OS: https://github.com/ggreer/the_silver_searcher
