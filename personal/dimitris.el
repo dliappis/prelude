@@ -10,7 +10,6 @@
 (require 'prelude-css)
 (require 'prelude-emacs-lisp)
 (require 'prelude-go)
-(require 'prelude-haskell)
 (require 'prelude-js)
 (require 'prelude-lisp)
 (require 'prelude-org) ;; Org-mode helps you keep TODO lists, notes and more
