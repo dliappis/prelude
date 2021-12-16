@@ -152,7 +152,7 @@
     (setq Y/markdown-process
           (start-process-shell-command "emacs-markdown-preview"
                                        markdown-output-buffer-name
-                                       (format "~/bin/viewmarkdown --browser %s" buffer-file-name)))
+                                       (format "~/.local/bin/viewmarkdown --browser %s" buffer-file-name)))
     (run-with-timer 10 ; sec
                     nil (lambda ()
                           (when (process-live-p Y/markdown-process)
@@ -205,6 +205,10 @@ at the top level of DIRECTORY."
            (when (projectile-project-p)
              (projectile-add-known-project (projectile-project-root))))))
      subdirs)))
+
+;; show line numbers everywhere
+(add-hook 'text-mode-hook 'display-line-numbers-mode)
+(add-hook 'python-mode-hook 'display-line-numbers-mode)
 
 (provide 'dimitris)
 ;;; dimitris.el ends here
