@@ -1,11 +1,9 @@
 ;;; prelude-mode.el --- Emacs Prelude: minor mode
 ;;
-;; Copyright © 2011-2018 Bozhidar Batsov
+;; Copyright © 2011-2021 Bozhidar Batsov
 ;;
 ;; Author: Bozhidar Batsov <bozhidar@batsov.com>
 ;; URL: https://github.com/bbatsov/prelude
-;; Version: 1.0.0
-;; Keywords: convenience
 
 ;; This file is not part of GNU Emacs.
 
@@ -38,10 +36,10 @@
 (defvar prelude-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-c o") 'crux-open-with)
-    (define-key map (kbd "C-c g") 'prelude-google)
-    (define-key map (kbd "C-c G") 'prelude-github)
-    (define-key map (kbd "C-c y") 'prelude-youtube)
-    (define-key map (kbd "C-c U") 'prelude-duckduckgo)
+    (define-key map (kbd "C-c C-/ g") 'prelude-google)
+    (define-key map (kbd "C-c C-/ h") 'prelude-github)
+    (define-key map (kbd "C-c C-/ y") 'prelude-youtube)
+    (define-key map (kbd "C-c C-/ d") 'prelude-duckduckgo)
     ;; mimic popular IDEs binding, note that it doesn't work in a terminal session
     (define-key map (kbd "C-a") 'crux-move-beginning-of-line)
     (define-key map [(shift return)] 'crux-smart-open-line)
@@ -52,7 +50,7 @@
     (define-key map [(meta shift up)]  'move-text-up)
     (define-key map [(meta shift down)]  'move-text-down)
     (define-key map (kbd "C-c n") 'crux-cleanup-buffer-or-region)
-    (define-key map (kbd "C-c f")  'crux-recentf-ido-find-file)
+    (define-key map (kbd "C-c f")  'crux-recentf-find-file)
     (define-key map (kbd "C-M-z") 'crux-indent-defun)
     (define-key map (kbd "C-c u") 'crux-view-url)
     (define-key map (kbd "C-c e") 'crux-eval-and-replace)
@@ -68,59 +66,59 @@
     (define-key map (kbd "C-c S") 'crux-find-shell-init-file)
     (define-key map (kbd "C-c i") 'imenu-anywhere)
     ;; extra prefix for projectile
-    (define-key map (kbd "s-p") 'projectile-command-map)
+    (when prelude-super-keybindings
+     (define-key map (kbd "s-p") 'projectile-command-map))
+    (define-key map (kbd "C-c p") 'projectile-command-map)
     ;; make some use of the Super key
-    (define-key map (kbd "s-g") 'god-local-mode)
-    (define-key map (kbd "s-r") 'crux-recentf-ido-find-file)
-    (define-key map (kbd "s-j") 'crux-top-join-line)
-    (define-key map (kbd "s-k") 'crux-kill-whole-line)
-    (define-key map (kbd "s-m m") 'magit-status)
-    (define-key map (kbd "s-m l") 'magit-log)
-    (define-key map (kbd "s-m f") 'magit-log-buffer-file)
-    (define-key map (kbd "s-m b") 'magit-blame)
-    (define-key map (kbd "s-o") 'crux-smart-open-line-above)
-
+    (when prelude-super-keybindings
+      ;; crux
+      (define-key map (kbd "s-r") 'crux-recentf-find-file)
+      (define-key map (kbd "s-j") 'crux-top-join-line)
+      (define-key map (kbd "s-k") 'crux-kill-whole-line)
+      (define-key map (kbd "s-o") 'crux-smart-open-line-above)
+      ;; magit
+      (define-key map (kbd "s-m m") 'magit-status)
+      (define-key map (kbd "s-m j") 'magit-dispatch)
+      (define-key map (kbd "s-m k") 'magit-file-dispatch)
+      (define-key map (kbd "s-m l") 'magit-log-buffer-file)
+      (define-key map (kbd "s-m b") 'magit-blame)
+      ;; misc
+      (define-key map (kbd "s-/") 'hippie-expand))
+    (easy-menu-define prelude-mode-menu map
+      "Prelude's menu."
+      '("Prelude"
+        ("Files"
+         ["Open with..." crux-open-with]
+         ["Re-open as root" crux-reopen-as-root]
+         ["Delete file and buffer" crux-delete-file-and-buffer]
+         ["Rename buffer and file" crux-rename-buffer-and-file]
+         ["Find init file" crux-find-user-init-file]
+         ["Find custom file" crux-find-user-custom-file]
+         ["Find shell config file" crux-find-shell-init-file])
+        ("Buffers"
+         ["Clean up buffer or region" crux-cleanup-buffer-or-region]
+         ["Kill other buffers" crux-kill-other-buffers])
+        ("Editing"
+         ["Go to beginning of line" crux-move-beginning-of-line]
+         ["Kill line" crux-smart-kill-line]
+         ["Kill whole line" crux-kill-whole-line]
+         ["Insert empty line below" crux-smart-open-line]
+         ["Insert empty line above" crux-smart-open-line-above]
+         ["Move up" move-text-up]
+         ["Move down" move-text-down]
+         ["Duplicate line or region" crux-duplicate-current-line-or-region]
+         ["Indent rigidly and copy to clipboard" crux-indent-rigidly-and-copy-to-clipboard]
+         ["Indent defun" crux-indent-defun]
+         ["Insert date" crux-insert-date]
+         ["Eval and replace" crux-eval-and-replace])
+        ("Windows"
+         ["Swap windows" crux-swap-windows])
+        ("General"
+         ["Visit term buffer" crux-visit-term-buffer]
+         ["Search in Google" prelude-google]
+         ["View URL" crux-view-url])))
     map)
   "Keymap for Prelude mode.")
-
-(defun prelude-mode-add-menu ()
-  "Add a menu entry for `prelude-mode' under Tools."
-  (easy-menu-add-item nil '("Tools")
-                      '("Prelude"
-                        ("Files"
-                         ["Open with..." crux-open-with]
-                         ["Delete file and buffer" crux-delete-file-and-buffer]
-                         ["Rename buffer and file" crux-rename-buffer-and-file])
-
-                        ("Buffers"
-                         ["Clean up buffer or region" crux-cleanup-buffer-or-region]
-                         ["Kill other buffers" crux-kill-other-buffers])
-
-                        ("Editing"
-                         ["Insert empty line" prelude-insert-empty-line]
-                         ["Move line up" prelude-move-line-up]
-                         ["Move line down" prelude-move-line-down]
-                         ["Duplicate line or region" prelude-duplicate-current-line-or-region]
-                         ["Indent rigidly and copy to clipboard" crux-indent-rigidly-and-copy-to-clipboard]
-                         ["Insert date" crux-insert-date]
-                         ["Eval and replace" crux-eval-and-replace]
-                         )
-
-                        ("Windows"
-                         ["Swap windows" crux-swap-windows])
-
-                        ("General"
-                         ["Visit term buffer" crux-visit-term-buffer]
-                         ["Search in Google" prelude-google]
-                         ["View URL" crux-view-url]))
-                      "Search Files (Grep)...")
-
-  (easy-menu-add-item nil '("Tools") '("--") "Search Files (Grep)..."))
-
-(defun prelude-mode-remove-menu ()
-  "Remove `prelude-mode' menu entry."
-  (easy-menu-remove-item nil '("Tools") "Prelude")
-  (easy-menu-remove-item nil '("Tools") "--"))
 
 ;; define minor mode
 (define-minor-mode prelude-mode
@@ -129,21 +127,7 @@
 \\{prelude-mode-map}"
   :lighter " Pre"
   :keymap prelude-mode-map
-  (if prelude-mode
-      ;; on start
-      (prelude-mode-add-menu)
-    ;; on stop
-    (prelude-mode-remove-menu)))
-
-(define-globalized-minor-mode prelude-global-mode prelude-mode prelude-on)
-
-(defun prelude-on ()
-  "Turn on `prelude-mode'."
-  (prelude-mode +1))
-
-(defun prelude-off ()
-  "Turn off `prelude-mode'."
-  (prelude-mode -1))
+  :global t)
 
 (provide 'prelude-mode)
 ;;; prelude-mode.el ends here

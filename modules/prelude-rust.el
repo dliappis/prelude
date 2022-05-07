@@ -1,8 +1,6 @@
 ;;; prelude-rust.el --- Emacs Prelude: Rust programming support.
 ;;
-;; Authors: Doug MacEachern, Manoel Vilela
-;; Version: 1.0.1
-;; Keywords: convenience rust
+;; Authors: Doug MacEachern, Manoel Vilela, Ben Alex
 
 ;; This file is not part of GNU Emacs.
 
@@ -31,36 +29,47 @@
 
 (require 'prelude-programming)
 
-;; You may need installing the following packages on your system:
+;; You may need to install the following packages on your system:
 ;; * rustc (Rust Compiler)
 ;; * cargo (Rust Package Manager)
 ;; * racer (Rust Completion Tool)
 ;; * rustfmt (Rust Tool for formatting code)
+;; * rls (Rust Language Server, if the prelude-lsp feature is enabled)
 
 (prelude-require-packages '(rust-mode
-                            racer
+                            cargo
                             flycheck-rust
-                            cargo))
+                            ron-mode))
+
+(unless (featurep 'prelude-lsp)
+  (prelude-require-packages '(racer)))
 
 (setq rust-format-on-save t)
 
-(eval-after-load 'rust-mode
-  '(progn
-     (add-hook 'rust-mode-hook 'racer-mode)
-     (add-hook 'racer-mode-hook 'eldoc-mode)
-     (add-hook 'rust-mode-hook 'cargo-minor-mode)
-     (add-hook 'rust-mode-hook 'flycheck-rust-setup)
-     (add-hook 'flycheck-mode-hook 'flycheck-rust-setup)
+(with-eval-after-load 'rust-mode
+  (add-hook 'rust-mode-hook 'cargo-minor-mode)
+  (add-hook 'flycheck-mode-hook 'flycheck-rust-setup)
 
-     (defun prelude-rust-mode-defaults ()
-       (local-set-key (kbd "C-c C-d") 'racer-describe)
-       ;; CamelCase aware editing operations
-       (subword-mode +1))
+  (if (featurep 'prelude-lsp)
+      (add-hook 'rust-mode-hook 'lsp)
+    (add-hook 'rust-mode-hook 'racer-mode)
+    (add-hook 'racer-mode-hook 'eldoc-mode))
 
-     (setq prelude-rust-mode-hook 'prelude-rust-mode-defaults)
+  (defun prelude-rust-mode-defaults ()
+    (unless (featurep 'prelude-lsp)
+      (local-set-key (kbd "C-c C-d") 'racer-describe)
+      (local-set-key (kbd "C-c .") 'racer-find-definition)
+      (local-set-key (kbd "C-c ,") 'pop-tag-mark))
 
-     (add-hook 'rust-mode-hook (lambda ()
-                               (run-hooks 'prelude-rust-mode-hook)))))
+    ;; Prevent #! from chmodding rust files to be executable
+    (remove-hook 'after-save-hook 'executable-make-buffer-file-executable-if-script-p)
+    ;; CamelCase aware editing operations
+    (subword-mode +1))
+
+  (setq prelude-rust-mode-hook 'prelude-rust-mode-defaults)
+
+  (add-hook 'rust-mode-hook (lambda ()
+                              (run-hooks 'prelude-rust-mode-hook))))
 
 (provide 'prelude-rust)
 ;;; prelude-rust.el ends here

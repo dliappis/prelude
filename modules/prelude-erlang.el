@@ -1,10 +1,8 @@
 ;;; prelude-erlang.el --- Emacs Prelude: Erlang programming support.
 ;;
-;; Copyright © 2011-2018 Gleb Peregud
+;; Copyright © 2011-2021 Gleb Peregud
 ;;
 ;; Author: Gleb Peregud <gleber.p@gmail.com>
-;; Version: 1.0.0
-;; Keywords: convenience erlang
 
 ;; This file is not part of GNU Emacs.
 
@@ -44,9 +42,8 @@
 
 (when (require 'erlang-start nil t)
 
-  (eval-after-load 'erlang-mode
-    '(progn
-       (flymake-mode)))
+  (with-eval-after-load 'erlang-mode
+    (flymake-mode))
 
   (when (not (null wrangler-path))
     (add-to-list 'load-path wrangler-path)
