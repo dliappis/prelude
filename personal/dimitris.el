@@ -1,8 +1,6 @@
 ;; Define packages instead of modifying prelude-modules.el
 (require 'prelude-erc)
 ;; (require 'prelude-ido) ;; Super charges Emacs completion for C-x C-f and more
-(require 'prelude-helm) ;; Interface for narrowing and search
-(require 'prelude-helm-everywhere) ;; Enable Helm everywhere
 (require 'prelude-company)
 ;;; Programming languages support
 (require 'prelude-c)
@@ -22,15 +20,137 @@
 (require 'prelude-xml)
 (require 'prelude-yaml)
 
-;; Use C-c p everywhere for projectile commands
+;; ************************** SECTION START **************************
+;; 20250827 moved away from helm to ivy/counsel/swipper
+;; === Prelude: Ivy/Counsel/Swiper + Projectile (Helm-free setup) ===
+
+;; === Prelude: Ivy/Counsel/Swiper + Projectile (Helm-free, stable) ===
+(require 'prelude-ivy)
+
+;; ---------- Projectile persistence: set path first, then load ----------
+;; 1) Point to the file you already have (yours is populated):
+(setq projectile-known-projects-file
+      (expand-file-name ".projectile-bookmarks.eld" user-emacs-directory))
+
+;; 2) Turn on Projectile and Counsel-Projectile
+(projectile-mode +1)
+(counsel-projectile-mode 1)
+
+;; 3) Force-load the list at startup (belt & suspenders)
+(add-hook 'after-init-hook #'projectile-load-known-projects)
+
+;; 4) Save on add/remove so it always persists
+(advice-add 'projectile-add-known-project    :after (lambda (&rest _) (projectile-save-known-projects)))
+(advice-add 'projectile-remove-known-project :after (lambda (&rest _) (projectile-save-known-projects)))
+
+(use-package ivy
+  :ensure t :demand t
+  :init (ivy-mode 1)
+  :config
+  (setq ivy-use-virtual-buffers t
+        enable-recursive-minibuffers t
+        ivy-wrap t
+        ivy-count-format "(%d/%d) "))
+
+(use-package counsel
+  :ensure t :after ivy
+  :init (counsel-mode 1)
+  :config
+  (global-set-key (kbd "M-x")       #'counsel-M-x)
+  (global-set-key (kbd "C-x C-f")   #'counsel-find-file)
+  (global-set-key (kbd "C-x b")     #'ivy-switch-buffer)
+  (global-set-key (kbd "C-h b")     #'counsel-descbinds)
+  (global-set-key (kbd "C-c r")     #'counsel-recentf)
+  (global-set-key (kbd "C-c k")     #'counsel-rg))   ; needs ripgrep
+
+(use-package swiper
+  :ensure t :after ivy
+  :bind (("C-s" . swiper) ("C-r" . swiper)))
+
+;; Ivy speed-ups
+(when (featurep 'ivy-rich) (ivy-rich-mode -1))
+(when (featurep 'all-the-icons-ivy-rich) (all-the-icons-ivy-rich-mode -1))
+(setq ivy-format-functions-alist '((t . ivy-format-function-line)))
+(setq ivy-height 12
+      ivy-wrap nil
+      ivy-re-builders-alist '((t . ivy--regex-plus))
+      ivy-dynamic-exhibit-delay-ms 50)
+
+;; Projectile (persisted, fast)
+(setq projectile-globally-ignored-directories
+      '(".git" ".hg" ".svn" "node_modules" "dist" "build" "out" "vendor" ".idea" ".vscode"))
+(setq projectile-enable-caching t
+      projectile-indexing-method 'alien)
+(setq projectile-known-projects-file
+      (expand-file-name ".projectile-bookmarks.eld" user-emacs-directory))
+
+;; Optional: auto-discover on startup (edit paths, then uncomment)
+;; (setq projectile-project-search-path '("~/code" "~/work"))
+;; (add-hook 'emacs-startup-hook
+;;           (lambda () (projectile-discover-projects-in-search-path)))
+
+;; Use C-c p prefix everywhere
 (require 'projectile)
-;;(define-key projectile-mode-map projectile-keymap-prefix nil)
 (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 
-;; Packages required for silver search (ag) in projectile
-;; NOTE: You also need `the_silver_searcher' package on your OS: https://github.com/ggreer/the_silver_searcher
-(prelude-require-package 'ag) ;; https://github.com/Wilfred/ag.el
-(prelude-require-package 'helm-ag) ;; https://github.com/syohex/emacs-helm-ag
+;; Counsel-Projectile key habits
+(with-eval-after-load 'projectile
+  (define-key projectile-mode-map (kbd "C-c p f") #'counsel-projectile-find-file)
+  (define-key projectile-mode-map (kbd "C-c p p") #'counsel-projectile-switch-project)
+  (define-key projectile-mode-map (kbd "C-c p s r") #'counsel-projectile-rg)) ; or s a for ag
+
+;; AG (silver searcher) integration (OS must have `ag`)
+(prelude-require-package 'ag)
+
+;; === Treemacs (independent, stable) ===
+(use-package treemacs
+  :ensure t :defer t
+  :config
+  (setq treemacs-width 30)
+  (treemacs-follow-mode 1)
+  (treemacs-filewatch-mode 1)
+  (treemacs-git-mode 'none))  ;; later try 'simple; avoid 'deferred for now
+
+(use-package treemacs-projectile
+  :ensure t :after (treemacs projectile))
+
+;; Treemacs toggles + usability
+(with-eval-after-load 'treemacs
+  (global-set-key (kbd "C-x t t") #'treemacs)
+  (global-set-key (kbd "C-x t 1") #'treemacs-delete-other-windows)
+  (global-set-key (kbd "C-x t C-t") #'treemacs-find-file)
+  ;; PageUp / PageDown scrolling in the tree
+  (define-key treemacs-mode-map (kbd "<prior>") #'scroll-down-command)
+  (define-key treemacs-mode-map (kbd "<next>")  #'scroll-up-command))
+
+(with-eval-after-load 'winum
+  (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
+
+;; ************************* SECTION END: Ivy/Councel/Projectile ***************
+
+
+;;************  Open Treemacs on the project picked via C-c p p ****************
+(defun my/open-project-in-treemacs (project)
+  "Show PROJECT in Treemacs (add it if needed), then focus the Treemacs window."
+  (let ((default-directory project))
+    (require 'treemacs)
+    ;; Ensure Treemacs is visible (don't toggle it off if it's already open)
+    (when (not (memq (treemacs-current-visibility) '(visible exists)))
+      (treemacs))
+    ;; Try to add the project to the workspace; ignore overlaps/duplicates
+    (condition-case nil
+        (treemacs-add-project-to-workspace
+         project (file-name-nondirectory (directory-file-name project)))
+      (error nil))
+    ;; Show only the chosen project's tree if available, then focus it
+    (when (fboundp 'treemacs-display-current-project-exclusively)
+      (treemacs-display-current-project-exclusively))
+    (when (fboundp 'treemacs-select-window)
+      (treemacs-select-window))))
+
+(setq counsel-projectile-switch-project-action #'my/open-project-in-treemacs)
+;; ********************** SECTION END ********************************
+
 
 ;; Minor mode to help with Indent Guide marks
 (prelude-require-package 'indent-guide)
