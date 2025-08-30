@@ -34,7 +34,6 @@
 
 ;; 2) Turn on Projectile and Counsel-Projectile
 (projectile-mode +1)
-(counsel-projectile-mode 1)
 
 ;; 3) Force-load the list at startup (belt & suspenders)
 (add-hook 'after-init-hook #'projectile-load-known-projects)
@@ -62,6 +61,13 @@
   (global-set-key (kbd "C-h b")     #'counsel-descbinds)
   (global-set-key (kbd "C-c r")     #'counsel-recentf)
   (global-set-key (kbd "C-c k")     #'counsel-rg))   ; needs ripgrep
+
+;; Counsel-Projectile (install + enable after counsel & projectile)
+(use-package counsel-projectile
+  :ensure t
+  :after (counsel projectile)
+  :config
+  (counsel-projectile-mode 1))
 
 (use-package swiper
   :ensure t :after ivy
