@@ -179,26 +179,10 @@
 ;; Theme
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
 (setq custom-theme-directory "~/.emacs.d/themes")
-(prelude-require-package 'color-theme-sanityinc-tomorrow)
-;; Solarized (dark) is really nice, but it's colors don't work too well with magit
-;;(prelude-require-package 'solarized-theme)
-;;(load-theme 'solarized-dark t)
-(prelude-require-package 'zenburn-theme)
-(load-theme 'zenburn t)
-;; (prelude-require-package 'xterm-color)
-;; (require 'xterm-color)
-;; (set-face-attribute 'mode-line () :height 80 :background "#0C1F1F")
-;; (set-face-attribute 'mode-line-inactive () :height 80 :background "#0C1F1F")
 
-;; (set-face-attribute 'cursor () :background "#0f0")
-;; (add-hook 'minibuffer-setup-hook (lambda ()
-;;                                    (setq-local face-remapping-alist '((default :height 80)))))
-;; (with-current-buffer (get-buffer " *Echo Area 0*")
-;;   (setq-local face-remapping-alist '((default :height 80))))
-;; (with-current-buffer (get-buffer " *Echo Area 1*")
-;;   (setq-local face-remapping-alist '((default :height 80))))
-;; (set-face-attribute 'default nil :height 90)
-
+(prelude-require-package 'doom-themes)
+(load-theme 'doom-one t)
+(set-frame-font "JetBrains Mono 10" t t)
 
 ;; Look and Feel
 ;(global-rainbow-delimiters-mode)
@@ -220,19 +204,6 @@
 (add-hook 'prelude-prog-mode-hook 'set-prelude-prog-mode-defaults t)
 (setq initial-scratch-message nil)
 (setq inhibit-startup-message t)
-
-
-;; AsciiDoc mode
-(prelude-require-package 'adoc-mode)
-(add-to-list 'auto-mode-alist '("\\.asciidoc\\'" . adoc-mode))
-
-
-;; Puppet
-(defun puppet-lint-fix ()
-  "Run the current buffer's file through 'puppet-lint --fix'."
-  (interactive)
-  (puppet-run-check-command (concat "puppet-lint --fix " (buffer-file-name)) "*puppet-lint*"))
-
 
 ;; Ansible
 (prelude-require-package 'company-ansible)
@@ -314,23 +285,12 @@
 
 (setq js-indent-level 2)
 
-;; monkey patch discover prjectile projects
-(defun projectile-discover-projects-in-directory (directory)
-  "Discover any projects in DIRECTORY and add them to the projectile cache.
-This function is not recursive and only adds projects with roots
-at the top level of DIRECTORY."
-  (interactive
-   (list (read-directory-name "Starting directory: ")))
-  (let ((subdirs (directory-files directory t)))
-    (mapcar
-     (lambda (dir)
-       (when (and (file-directory-p dir)
-                  (not (member (file-name-nondirectory dir) '(".." "."))))
-         (let ((default-directory dir)
-               (projectile-cached-project-root dir))
-           (when (projectile-project-p)
-             (projectile-add-known-project (projectile-project-root))))))
-     subdirs)))
+;; go-mode
+
+(add-hook 'go-mode-hook
+          (lambda ()
+            (setq tab-width 4)          ;; show tabs as 4 spaces
+            (setq indent-tabs-mode t))) ;; still insert tabs (not spaces)
 
 ;; show line numbers everywhere
 (add-hook 'text-mode-hook 'display-line-numbers-mode)
