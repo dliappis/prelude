@@ -20,6 +20,11 @@
 (require 'prelude-xml)
 (require 'prelude-yaml)
 
+;; Set treemacs default git mode eagerly before it starts
+;; Treemacs: load once at init and lock git mode to 'simple'
+(require 'treemacs)                 ;; eager load so no interactive prompt runs first
+(treemacs-git-mode 'simple)         ;; or 'none / 'extended
+
 ;; ************************** SECTION START **************************
 ;; 20250827 moved away from helm to ivy/counsel/swipper
 ;; === Prelude: Ivy/Counsel/Swiper + Projectile (Helm-free setup) ===
@@ -114,8 +119,7 @@
   :config
   (setq treemacs-width 30)
   (treemacs-follow-mode 1)
-  (treemacs-filewatch-mode 1)
-  (treemacs-git-mode 'none))  ;; later try 'simple; avoid 'deferred for now
+  (treemacs-filewatch-mode 1))  ;; later try 'simple; avoid 'deferred for now
 
 (use-package treemacs-projectile
   :ensure t :after (treemacs projectile))
@@ -136,19 +140,28 @@
 
 
 ;;************  Open Treemacs on the project picked via C-c p p ****************
+(require 'cl-lib)
 (defun my/open-project-in-treemacs (project)
-  "Show PROJECT in Treemacs (add it if needed), then focus the Treemacs window."
-  (let ((default-directory project))
+  "Show PROJECT in Treemacs (add it if needed) without interactive prompts,
+and make PROJECT the current default-directory."
+  (let* ((proj (file-name-as-directory (expand-file-name project)))
+         (name (file-name-nondirectory (directory-file-name proj))))
+    ;; Make sure subsequent calls see the chosen project as CWD.
+    (setq default-directory proj)
+
     (require 'treemacs)
-    ;; Ensure Treemacs is visible (don't toggle it off if it's already open)
-    (when (not (memq (treemacs-current-visibility) '(visible exists)))
+    (require 'treemacs-projectile nil t)
+
+    ;; Add project *before* opening the UI. Force non-interactive (no prompts).
+    (cl-letf* (((symbol-function 'read-string)
+                (lambda (&rest _) name)))
+      (condition-case nil
+          (treemacs-add-project-to-workspace proj name)
+        (error nil)))
+
+    ;; Now show Treemacs (if not already visible) and focus it.
+    (unless (memq (treemacs-current-visibility) '(visible exists))
       (treemacs))
-    ;; Try to add the project to the workspace; ignore overlaps/duplicates
-    (condition-case nil
-        (treemacs-add-project-to-workspace
-         project (file-name-nondirectory (directory-file-name project)))
-      (error nil))
-    ;; Show only the chosen project's tree if available, then focus it
     (when (fboundp 'treemacs-display-current-project-exclusively)
       (treemacs-display-current-project-exclusively))
     (when (fboundp 'treemacs-select-window)
