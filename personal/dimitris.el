@@ -92,8 +92,6 @@
       '(".git" ".hg" ".svn" "node_modules" "dist" "build" "out" "vendor" ".idea" ".vscode"))
 (setq projectile-enable-caching t
       projectile-indexing-method 'alien)
-(setq projectile-known-projects-file
-      (expand-file-name ".projectile-bookmarks.eld" user-emacs-directory))
 
 ;; Optional: auto-discover on startup (edit paths, then uncomment)
 ;; (setq projectile-project-search-path '("~/code" "~/work"))
@@ -115,7 +113,7 @@
 
 ;; === Treemacs (independent, stable) ===
 (use-package treemacs
-  :ensure t :defer t
+  :ensure t
   :config
   (setq treemacs-width 30)
   (treemacs-follow-mode 1)
@@ -227,7 +225,8 @@ and make PROJECT the current default-directory."
 (prelude-require-package 'auto-complete)
 (prelude-require-package 'ac-etags)
 (require 'auto-complete)
-(global-auto-complete-mode t)
+;; we don't enable auto complete globally to avoid conflicts with lsp completion
+;; (global-auto-complete-mode t)
 
 ;; hcl-mode
 (prelude-require-packages '(hcl-mode))
@@ -300,10 +299,57 @@ and make PROJECT the current default-directory."
 
 ;; go-mode
 
+;; --- Go: use LSP/xref instead of godef/godoc ---
+(prelude-require-package 'lsp-mode)
+
+(with-eval-after-load 'go-mode
+  ;; Start LSP (deferred so it’s snappy)
+  (add-hook 'go-mode-hook #'lsp-deferred)
+
+  ;; Unbind Prelude/go-mode legacy keys that call godef/godoc
+  (define-key go-mode-map (kbd "C-c C-j") nil) ; was godef-jump
+  (define-key go-mode-map (kbd "C-c C-d") nil) ; was godoc-at-point
+
+  ;; Rebind to LSP/xref
+  (define-key go-mode-map (kbd "C-c C-j") #'lsp-find-definition)        ; jump to def
+  (define-key go-mode-map (kbd "C-c C-d") #'lsp-describe-thing-at-point) ; hover/doc
+
+  ;; Nice to have: use standard xref too
+  (define-key go-mode-map (kbd "M-.") #'xref-find-definitions)
+  (define-key go-mode-map (kbd "M-,") #'xref-pop-marker-stack))
+
+  (add-hook 'before-save-hook #'lsp-organize-imports nil t)
+  (add-hook 'before-save-hook #'lsp-format-buffer nil t)
+
+;; On-demand docs, no autoshow
+(with-eval-after-load 'lsp-mode
+  (define-key lsp-mode-map (kbd "C-c h") #'lsp-describe-thing-at-point))
+
+;; Don't eagerly show documentation popups with cursor movement -- this is soft disable
+(with-eval-after-load 'lsp-ui
+  (setq lsp-ui-doc-enable nil
+        lsp-ui-doc-show-with-cursor nil
+        lsp-ui-doc-show-with-mouse  nil
+        lsp-ui-sideline-enable nil))
+
+;; hard disable (if something sneaky re-enables lsp-ui)
+(with-eval-after-load 'lsp-ui
+  (add-hook 'lsp-ui-mode-hook (lambda () (lsp-ui-doc-mode -1)))
+  (add-hook 'lsp-ui-mode-hook (lambda () (lsp-ui-sideline-mode -1)))
+  (when (fboundp 'lsp-ui-doc--make-frame)
+    (advice-add 'lsp-ui-doc--make-frame :override #'ignore)))
+
+(with-eval-after-load 'lsp-mode
+  (remove-hook 'lsp-mode-hook #'lsp-ui-mode)
+  (setq lsp-eldoc-enable-hover nil
+        lsp-eldoc-render-all nil
+        lsp-signature-auto-activate nil))
+
 (add-hook 'go-mode-hook
           (lambda ()
             (setq tab-width 4)          ;; show tabs as 4 spaces
             (setq indent-tabs-mode t))) ;; still insert tabs (not spaces)
+
 
 ;; show line numbers everywhere
 (add-hook 'text-mode-hook 'display-line-numbers-mode)
